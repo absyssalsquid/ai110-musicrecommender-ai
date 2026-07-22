@@ -5,39 +5,40 @@
 ---
 
 ## Agentic Workflow (SF8)
+> Document your experience using an AI agent (e.g., Cursor Agent, Claude, Copilot) to make multi-step changes autonomously.
+
+**What task did you give the agent?**
+Diversity and Fairness Logic
+
+**Prompts used:**
+describe different ways to apply scoring penalties to songs, for the purpose of preventing all recommendations from being too similar 
+
+**What did the agent generate or change?**
+refactored the code so that the function for calculating feature difference can be used in both song vs user and song vs song
+
+**What did you verify or fix manually?**
+added an inversion parameter to calculate similarity vs difference
+
+---
+
+## Agentic Workflow (SF8)
 
 > Document your experience using an AI agent (e.g., Cursor Agent, Claude, Copilot) to make multi-step changes autonomously.
 
 **What task did you give the agent?**
 
-<!-- Describe the goal you asked the agent to accomplish -->
+Visual Summary Table
 
 **Prompts used:**
 
-<!-- Paste the key prompts you gave the agent -->
+in main.py, format the top recommendations into a table. 
+columns: Song, Artist , Score w/o penalty, Similarity penalty, genre, mood, energy....
+for each feature, mark o if it is high alignment, and an x if it is low alignment
 
 **What did the agent generate or change?**
+added a function to main.py to print the recommendations
 
-<!-- List the files edited, code generated, or commands run -->
-
-**What did you verify or fix manually?**
-
-<!-- Describe anything the agent got wrong or that required human review -->
+**What did you verify or fix manually?**  
+the legend format was originally messed up, requiired manual formatting
 
 ---
-
-## Design Pattern (SF10)
-
-> Document how AI helped you choose or implement a design pattern.
-
-**Which design pattern did you use?**
-
-<!-- e.g., Strategy, Factory, Observer, etc. -->
-
-**How did AI help you brainstorm or implement it?**
-
-<!-- Describe the conversation or suggestions that led to your decision -->
-
-**How does the pattern appear in your final code?**
-
-<!-- Point to the relevant class or method -->

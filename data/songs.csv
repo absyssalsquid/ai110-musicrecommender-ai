@@ -1,11 +1,71 @@
-id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness
-1,Sunrise City,Neon Echo,pop,happy,0.82,118,0.84,0.79,0.18
-2,Midnight Coding,LoRoom,lofi,chill,0.42,78,0.56,0.62,0.71
-3,Storm Runner,Voltline,rock,intense,0.91,152,0.48,0.66,0.10
-4,Library Rain,Paper Lanterns,lofi,chill,0.35,72,0.60,0.58,0.86
-5,Gym Hero,Max Pulse,pop,intense,0.93,132,0.77,0.88,0.05
-6,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,60,0.65,0.41,0.92
-7,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,90,0.71,0.54,0.89
-8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22
-9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78
-10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35
+id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness,instrumentalness,speechiness
+1,Sunrise City,Neon Echo,pop,happy,0.82,118,0.84,0.79,0.18,0.03,0.05
+2,Midnight Coding,LoRoom,lofi,chill,0.42,78,0.56,0.62,0.71,0.85,0.04
+3,Storm Runner,Voltline,rock,intense,0.91,152,0.48,0.66,0.10,0.04,0.06
+4,Library Rain,Paper Lanterns,lofi,chill,0.35,72,0.60,0.58,0.86,0.88,0.03
+5,Gym Hero,Max Pulse,pop,intense,0.93,132,0.77,0.88,0.05,0.02,0.08
+6,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,60,0.65,0.41,0.92,0.90,0.04
+7,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,90,0.71,0.54,0.89,0.80,0.05
+8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22,0.72,0.04
+9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78,0.87,0.03
+10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35,0.05,0.06
+11,Concrete Verses,Blockprint,hip hop,moody,0.68,96,0.52,0.85,0.12,0.02,0.55
+12,Nocturne in Glass,Elise Varga,classical,melancholy,0.22,52,0.34,0.18,0.95,0.95,0.03
+13,Neon Overdrive,Pulsewidth,edm,triumphant,0.97,128,0.72,0.91,0.03,0.60,0.05
+14,Island Time,Coral Sound System,reggae,groovy,0.55,74,0.79,0.80,0.40,0.06,0.10
+15,Iron Cathedral,Ashen Crown,metal,aggressive,0.99,180,0.30,0.55,0.02,0.05,0.09
+16,Velvet Groove,The Meter Kings,funk,energetic,0.80,108,0.88,0.93,0.15,0.30,0.07
+17,Dust and Pine,Hollow Creek,folk,nostalgic,0.33,96,0.55,0.45,0.90,0.10,0.04
+18,Breakbeat Fever,Subsonic Unit,drum and bass,hypnotic,0.94,174,0.60,0.78,0.05,0.85,0.05
+19,Backroad Sunset,Wade Holloway,country,romantic,0.50,100,0.68,0.60,0.62,0.04,0.05
+20,Sunday Rising,The Redemption Choir,gospel,uplifting,0.72,88,0.90,0.70,0.45,0.05,0.06
+21,Grief Machine,Ashen Crown,metal,melancholy,0.85,120,0.25,0.45,0.06,0.20,0.06
+22,Coronation Suite,Elise Varga,classical,triumphant,0.70,100,0.82,0.30,0.90,0.96,0.03
+23,Shadow of Grace,The Redemption Choir,gospel,moody,0.55,76,0.45,0.55,0.55,0.10,0.08
+24,Bebop Inferno,Slow Stereo,jazz,intense,0.82,168,0.60,0.62,0.70,0.65,0.06
+25,Bright Static,Orbit Bloom,ambient,energetic,0.60,112,0.75,0.50,0.70,0.88,0.03
+26,Pitchfork Rebellion,Hollow Creek,folk,aggressive,0.78,140,0.40,0.55,0.75,0.08,0.10
+27,Rise Up Rhymes,Blockprint,hip hop,uplifting,0.72,100,0.85,0.86,0.15,0.03,0.48
+28,Highway Trance,Wade Holloway,country,hypnotic,0.45,92,0.55,0.58,0.55,0.20,0.05
+29,Sad Machine,Pulsewidth,edm,melancholy,0.80,140,0.35,0.70,0.10,0.55,0.05
+30,Slow Dance Tape,LoRoom,lofi,romantic,0.38,82,0.72,0.62,0.75,0.80,0.04
+31,Ember Ballad,Voltline,rock,romantic,0.65,76,0.70,0.50,0.30,0.10,0.05
+32,Victory Lap 1987,Neon Echo,synthwave,triumphant,0.85,118,0.78,0.75,0.10,0.68,0.04
+33,Dark Pocket,The Meter Kings,funk,moody,0.62,102,0.42,0.85,0.20,0.35,0.08
+34,Adagio Morning,Elise Varga,classical,chill,0.30,66,0.60,0.20,0.93,0.95,0.02
+35,Ascension Riff,Ashen Crown,metal,triumphant,0.95,160,0.68,0.55,0.04,0.15,0.06
+36,Rainy Kingston,Coral Sound System,reggae,melancholy,0.42,72,0.40,0.62,0.50,0.10,0.09
+37,Paper Hearts,Indigo Parade,pop,melancholy,0.60,100,0.35,0.70,0.25,0.03,0.06
+38,Liquid Sunshine,Subsonic Unit,drum and bass,uplifting,0.88,172,0.80,0.80,0.08,0.60,0.05
+39,Candlelight Standards,Slow Stereo,jazz,romantic,0.35,88,0.72,0.50,0.88,0.55,0.05
+40,Grey Horizon,Orbit Bloom,ambient,melancholy,0.25,58,0.30,0.30,0.94,0.92,0.03
+41,Overcast Crush,Paper Lanterns,indie pop,moody,0.58,112,0.45,0.68,0.40,0.15,0.06
+42,Clap and Shout,The Redemption Choir,gospel,energetic,0.85,120,0.92,0.80,0.35,0.05,0.10
+43,Lofi Rap Lounge,Blockprint,hip hop,chill,0.50,85,0.58,0.72,0.45,0.10,0.40
+44,Meadow Dance,Hollow Creek,folk,happy,0.55,118,0.85,0.62,0.82,0.10,0.05
+45,Old Radio Static,Voltline,rock,nostalgic,0.60,108,0.55,0.55,0.35,0.12,0.05
+46,Endless Loop,Pulsewidth,edm,hypnotic,0.82,126,0.50,0.82,0.05,0.80,0.03
+47,Outlaw Stomp,Wade Holloway,country,aggressive,0.75,128,0.48,0.60,0.45,0.06,0.08
+48,Rite of Storms,Elise Varga,classical,aggressive,0.88,150,0.35,0.25,0.85,0.94,0.03
+49,Neon Sunset Cruise,Neon Echo,synthwave,chill,0.50,100,0.62,0.65,0.25,0.75,0.03
+50,Slow Jam Groove,The Meter Kings,funk,romantic,0.55,90,0.75,0.82,0.30,0.25,0.06
+51,Djent Study,Ashen Crown,metal,focused,0.80,140,0.45,0.50,0.05,0.55,0.05
+52,Cassette Memories,LoRoom,lofi,nostalgic,0.38,76,0.55,0.58,0.78,0.85,0.04
+53,Deep Work Drone,Orbit Bloom,ambient,focused,0.30,64,0.55,0.30,0.80,0.95,0.02
+54,Soul Jazz Shuffle,Slow Stereo,jazz,groovy,0.68,112,0.78,0.80,0.65,0.55,0.06
+55,Beachside Pop,Indigo Parade,pop,relaxed,0.55,96,0.75,0.68,0.45,0.05,0.05
+56,Hardstyle Assault,Pulsewidth,edm,aggressive,0.98,150,0.45,0.78,0.03,0.55,0.06
+57,One Love Sunrise,Coral Sound System,reggae,uplifting,0.62,78,0.90,0.78,0.42,0.06,0.09
+58,Trap Warfare,Blockprint,hip hop,aggressive,0.85,140,0.35,0.82,0.08,0.04,0.60
+59,Barn Party,Wade Holloway,country,happy,0.70,120,0.88,0.72,0.50,0.05,0.06
+60,Moonlight Duet,Elise Varga,classical,romantic,0.35,70,0.68,0.22,0.94,0.96,0.02
+61,Widow's Lament,Hollow Creek,folk,melancholy,0.28,80,0.28,0.35,0.92,0.12,0.04
+62,Cyber Chase,Neon Echo,synthwave,aggressive,0.90,128,0.42,0.78,0.08,0.70,0.05
+63,Glory Hallelujah,The Redemption Choir,gospel,triumphant,0.88,112,0.95,0.72,0.40,0.05,0.07
+64,Neurofunk Assault,Subsonic Unit,drum and bass,aggressive,0.97,176,0.38,0.70,0.04,0.75,0.05
+65,Polaroid Summer,Paper Lanterns,indie pop,nostalgic,0.60,116,0.68,0.70,0.45,0.10,0.05
+66,Stadium Anthem,Voltline,rock,triumphant,0.90,134,0.80,0.62,0.10,0.08,0.05
+67,Aurora Embrace,Orbit Bloom,ambient,romantic,0.32,62,0.72,0.32,0.88,0.90,0.03
+68,Disco Sunshine,The Meter Kings,funk,happy,0.82,116,0.92,0.95,0.12,0.20,0.06
+69,Smoke and Whiskey,Slow Stereo,jazz,moody,0.45,84,0.40,0.55,0.82,0.70,0.06
+70,Doom Ritual,Ashen Crown,metal,hypnotic,0.78,68,0.32,0.42,0.10,0.40,0.05

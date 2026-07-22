@@ -1,0 +1,14 @@
+profile_id,name,genre,mood,energy,tempo_bpm,valence,danceability,acousticness,instrumentalness,speechiness,expected_top,tests
+1,Classical Purist,classical,melancholy,0.35,65,0.45,0.30,0.82,0.85,0.06,Nocturne in Glass,genre-pinned; numerics offset ~0.1 from target
+2,Metalhead,metal,aggressive,0.88,165,0.42,0.65,0.12,0.15,0.06,Iron Cathedral,offset high-energy; must still beat EDM/DnB on valence
+3,Lofi Studier,lofi,focused,.40,88,0.52,0.52,0.70,0.78,0.05,Focus Flow,within-genre: mood 'focused' must beat two 'chill' lofi tracks
+4,Hip Hop Head,hip hop,moody,0.58,104,0.60,0.78,0.20,0.08,0.45,Concrete Verses,offset but speechiness still decisive
+5,Festival EDM,edm,triumphant,0.88,134,0.80,0.82,0.10,0.45,0.06,Neon Overdrive,offset high-energy positive; must diverge from metal
+6,Acoustic Folk,folk,nostalgic,0.42,88,0.62,0.52,0.80,0.18,0.05,Dust and Pine,acoustic+vocal; must beat lofi/jazz/classical
+7,Ambient Drift,ambient,chill,0.38,70,0.58,0.50,0.82,0.80,0.05,Spacewalk Thoughts,numerics lean lofi but genre must pull to ambient
+8,Groovy Reggae,reggae,groovy,0.62,82,0.72,0.72,0.32,0.10,0.12,Island Time,genre-pinned; offset numerics
+9,Energetic Positive,,,0.85,120,0.85,0.88,0.10,0.10,0.06,Sunrise City,PURE NUMERIC — no genre/mood anchor; 4-way contest
+10,Mellow Acoustic,,,.3,72,0.58,0.52,0.85,0.60,0.04,Library Rain,PURE NUMERIC — no genre/mood anchor; acoustic cluster
+11,Pophead,pop,happy,0.80,110,0.70,0.66,0.40,0.02,0.30,Sunrise City
+12,Sparse,,,.5,92,,,,,
+13,Mystery

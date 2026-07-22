@@ -9,25 +9,115 @@ You will implement the functions in recommender.py:
 - recommend_songs
 """
 
-from recommender import load_songs, recommend_songs
+from recommender import load_songs, load_profiles, UserProfile, Recommender
 
 
 def main() -> None:
     songs = load_songs("data/songs.csv") 
+    rec = Recommender(songs)
 
-    # Starter example profile
-    user_prefs = {"genre": "pop", "mood": "happy", "energy": 0.8}
+    profiles = load_profiles("data/test_profiles.csv")
 
-    recommendations = recommend_songs(user_prefs, songs, k=5)
+    user_prefs = {
+        "genre": "pop",
+        "mood": "happy",
+        "energy": 0.8,
+        "tempo_bpm": 110,
+        "valence": 0.7,
+        "danceability" : 0.66, 
+        "acousticness": 0.4,
+        "instrumentalness": 0.02,
+        "speechiness": 0.8,
+    }
 
-    print("\nTop recommendations:\n")
-    for rec in recommendations:
-        # You decide the structure of each returned item.
-        # A common pattern is: (song, score, explanation)
-        song, score, explanation = rec
-        print(f"{song['title']} - Score: {score:.2f}")
-        print(f"Because: {explanation}")
+    for profile in profiles:
+        print_profile_summary(profile)
         print()
+
+        recommendations = rec.recommend_plus(profile, k=5)
+        print_recommendations_table(recommendations)
+
+
+def print_profile_summary(profile) -> None:
+    """Print the user profile the recommendations are based on."""
+    fields = [
+        ("name", "name"), ("genre", "genre"), ("mood", "mood"), ("energy", "energy"),
+        ("tempo_bpm", "tempo"), ("valence", "valence"), ("danceability", "danceability"),
+        ("acousticness", "acousticness"), ("instrumentalness", "instrumentalness"),
+        ("speechiness", "speechiness"),
+    ]
+
+    print("=" * 60)
+    print("USER PROFILE")
+    print("=" * 60)
+    for key, label in fields:
+        val = getattr(profile, key, None)
+        if val is None:
+            shown = "(any)"
+        elif isinstance(val, float):
+            shown = f"{val:.2f}"
+        else:
+            shown = str(val)
+        print(f"  {label:<16}: {shown}")
+
+
+def print_recommendations_table(recommendations) -> None:
+    """
+    Render recommend_plus() output as a fixed-width table with one column per
+    feature. Each feature cell shows:
+        o  high alignment (distance < 0.05)
+        x  low alignment  (distance > 0.95)
+        ·  in between
+    """
+    # (feature key, short column header)
+    features = [
+        ("genre", "gen"), ("mood", "mod"), ("energy", "enr"), ("tempo_norm", "tmp"),
+        ("valence", "val"), ("danceability", "dnc"), ("acousticness", "acu"),
+        ("instrumentalness", "ins"), ("speechiness", "spc"),
+    ]
+
+    headers = ["Song", "Artist", "Score", "Penalty"] + [label for _, label in features]
+
+    rows = []
+    for song, score_no_penalty, distance in recommendations:
+        penalty = distance.get("penalty", 0.0)
+
+        marks = []
+        for key, _ in features:
+            v = distance.get(key)
+            if v is None:  marks.append("-")      # feature not compared (unset preference)
+            elif v < 0.05: marks.append("o")      # high alignment
+            elif v > 0.95: marks.append("x")      # low alignment
+            else:          marks.append("·")      # partial
+
+        rows.append([
+            song.title,
+            song.artist,
+            f"{score_no_penalty:.2f}",
+            f"{penalty:.2f}" if penalty else "-",
+            *marks,
+        ])
+
+    # Column widths sized to the widest cell (header or value) in each column.
+    widths = [
+        max(len(headers[i]), *(len(row[i]) for row in rows)) if rows else len(headers[i])
+        for i in range(len(headers))
+    ]
+
+    def fmt(cells):
+        return " | ".join(cell.ljust(widths[i]) for i, cell in enumerate(cells))
+
+    print("=" * 60)
+    print("Top recommendations:")
+    print("=" * 60)
+    print(fmt(headers))
+    print("-+-".join("-" * w for w in widths))
+    for row in rows:
+        print(fmt(row))
+
+    print("\nlegend:\no = aligned (<0.05)\nx = unaligned (>0.95)\n· = partial")
+    print("\ngen=genre mod=mood enr=energy tmp=tempo val=valence "
+          "dnc=danceability acu=acousticness ins=instrumentalness spc=speechiness")
 
 
 if __name__ == "__main__":
