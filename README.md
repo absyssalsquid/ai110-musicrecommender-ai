@@ -1,37 +1,73 @@
-# 🎵 Music Recommender Simulation
+# 🎵 Music Recommender Simulation 2.0
 
 ## Project Summary
 
-In this project you will build and explain a small music recommender system.
+This app is an improvement over the original music recommender. The original music recommender computed recommendations by calculating weighted distances between a user's preference profile and each song in a small dataset, ranking songs by how closely their features aligned with the user's stated preferences
 
-Your goal is to:
-
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
-
-Replace this paragraph with your own summary of what your version does.
+This extension uses RAG over a much larger corpus of data from Spotify (15K songs and 10K artists) to allow for better recommendation, and also provide a human readable explanations of why it made a recommendation. It is able to leverage multi-genre artists to allow recommendation of closely related genres without users explicitly declaring them as a preference.
 
 ---
 
 ## How The System Works
 
-Explain your design in plain language.
+Songs have the features: *energy, valence, danceability, acousticness, tempo, speechiness, instrumentalness*. Users also have preferences for each. The recommender selects songs that are in alignment with user preferences.  
 
-Some prompts to answer:
+Pre-filtering is done on two bases: genre and song features. A temperature setting determines how broadly to search for adjacent genres and variability in song features from user preferences.  
+The filtered data is then structured for ingestion, and presented along with the prompt which includes user preference and temperature.
 
-- What features does each `Song` use in your system
-   - energy, tempo_bpm, valence, danceability, acousticness, instrumentalness, speechiness
-- What information does your `UserProfile` store
-  - it stores all the same features that a song has
-- How does your `Recommender` compute a score for each song
-  - for each feature, it calculates a weighted distance between user preferences and the song
-- How do you choose which songs to recommend
-  - Select songs that are most in alignment with the user preference (lowest distance)
+Mermaid diagram also includes old implementation of 
+```mermaid
+graph TD
+    subgraph "Input Data"
+        A["User Profiles<br/>(test_profiles.csv)"]
+        B["Songs Dataset<br/>(songs.csv)"]
+        C["Spotify Corpus<br/>(15K tracks, 10K artists)"]
+    end
 
-<!-- You can include a simple diagram or bullet list if helpful. -->
+    subgraph "Data Loading & Indexing"
+        D["load_profiles()"]
+        E["load_songs()"]
+        F["SpotifyCorpus<br/>load_tracks()<br/>load_artists()"]
+    end
 
+    subgraph "Legacy Recommender"
+        G["Recommender<br/>- extract_features()<br/>- feature_distance()<br/>- select_songs()"]
+        H["recommend_plus()<br/>weighted distance scoring<br/>+ diversity penalty"]
+    end
+
+    subgraph "RAG-Based Recommender"
+        subgraph RAG["RAGRecommender.recommend()"]
+            J["1. _retrieve_candidates()<br/>Genre-based +<br/>Feature-based retrieval"]
+            K["2. _augment_candidates()<br/>Enrich with artist<br/>metadata & popularity"]
+            L["3. _generate_recommendations()<br/>Gemini LLM ranking<br/>+ explanations"]
+            M["4. _hydrate_recommendations()<br/>Format UserRecommendation<br/>objects"]
+            J --> K --> L --> M
+        end
+        F --> J
+        D --> J
+    end
+
+    subgraph "Output"
+        N["Formatted<br/>Recommendations<br/>with explanations"]
+    end
+
+    A --> D
+    B --> E
+    C --> F
+    
+    D --> H
+    E --> G
+    G --> H
+    
+    M --> N
+    H -.Alternative Path.-> N
+
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#e1f5ff
+    style N fill:#c8e6c9
+    style RAG fill:#fff9c4
+```
 ---
 
 ## Getting Started
@@ -65,11 +101,9 @@ Run the starter tests with:
 pytest
 ```
 
-You can add more tests in `tests/test_recommender.py`.
-
 ---
 
-## Sample Recommendation Output
+## Sample Outputs
 
 Paste a sample of your recommender's output here as a text block so a reader can see what it produces:
 
@@ -77,60 +111,160 @@ Paste a sample of your recommender's output here as a text block so a reader can
 ============================================================
 USER PROFILE
 ============================================================
-  genre           : pop
-  mood            : happy
-  energy          : 0.80
-  tempo           : 110
-  valence         : 0.70
-  danceability    : 0.66
-  acousticness    : 0.40
-  instrumentalness: 0.02
-  speechiness     : 0.80
+  name            : Metalhead
+  genre           : metal
+  mood            : aggressive
+  energy          : 0.88
+  tempo           : (any)
+  valence         : 0.42
+  danceability    : 0.65
+  acousticness    : 0.12
+  instrumentalness: 0.15
+  speechiness     : 0.06
+
+tracks by genre: 73
+tracks by features: 14 at 0.1 limit
+querying gemini at T=0.3...
+
+================================================================================
+Top recommendations (RAG-powered from Spotify corpus):
+================================================================================
+
+1. RENEGADE MASTER by Unknown
+   Genres: 
+   Popularity: unknown
+   ? Matches high energy and danceability targets perfectly.
+
+2. My Curse by killswitch engage (established (1M+))
+   Genres: alternative metal, boston metal, melodic metalcore
+   Popularity: established (1M+)
+   ? Aligns closely with the user's high energy and low valence profile.
+
+3. Enter Sandman by metallica (major (5M+))
+   Genres: hard rock, metal, old school thrash
+   Popularity: major (5M+)
+   ? Strong energy alignment with moderate acoustic and instrumental scores.
+
+4. Rainbow In The Dark by dio (established (1M+))
+   Genres: album rock, alternative metal, glam metal
+   Popularity: established (1M+)
+   ? High energy score closely mirrors the user's primary preference.
+
+5. I Remember You by skid row (established (1M+))
+   Genres: album rock, glam metal, hard rock
+   Popularity: established (1M+)
+   ? Provides acoustic and instrumental scores near user preferences.
 
 ============================================================
-Top recommendations:
+USER PROFILE
 ============================================================
-Song               | Artist      | Score | Penalty | gen | mod | enr | tmp | val | dnc | acu | ins | spc
--------------------+-------------+-------+---------+-----+-----+-----+-----+-----+-----+-----+-----+----
-Sunrise City       | Neon Echo   | 0.39  | -       | o   | o   | o   | o   | o   | o   | o   | o   | ·  
-Gym Hero           | Max Pulse   | 1.48  | 2.09    | o   | x   | o   | o   | o   | o   | ·   | o   | ·  
-Concrete Verses    | Blockprint  | 4.24  | 2.88    | x   | x   | o   | o   | ·   | o   | ·   | o   | o  
-Spacewalk Thoughts | Orbit Bloom | 5.88  | 2.15    | x   | x   | ·   | ·   | o   | ·   | ·   | ·   | ·  
-Iron Cathedral     | Ashen Crown | 4.93  | 4.54    | x   | x   | ·   | ·   | ·   | o   | ·   | o   | ·  
+  name            : Classical Purist
+  genre           : classical
+  mood            : melancholy
+  energy          : 0.35
+  tempo           : (any)
+  valence         : 0.45
+  danceability    : 0.30
+  acousticness    : 0.82
+  instrumentalness: 0.85
+  speechiness     : 0.06
 
-legend:
-o = aligned (<0.05)
-x = unaligned (>0.95)
-· = partial
+n tracks by genre: 81
+n tracks by features: 2 at 0.1 limit
+querying gemini at T=0.3...
 
-gen=genre mod=mood enr=energy tmp=tempo val=valence dnc=danceability acu=acousticness ins=instrumentalness spc=speechiness
+================================================================================
+Top recommendations (RAG-powered from Spotify corpus):
+================================================================================
+
+1. Bereden väg för Herran (Psalm 103) by Unknown
+   Genres: 
+   Popularity: unknown
+   ? Matches Energy, Valence, and Instrumental metrics perfectly.
+
+2. Ouverture nach Französischer Art, BWV 831a (Arr. for Chamber Ensemble by Leonard Schick & Marsyas Baroque) by johann sebastian bach (major (5M+))
+   Genres: baroque, classical, early music
+   Popularity: major (5M+)
+   ? Strong alignment with Energy, Valence, and Danceability preferences.
+
+3. Stimmungsbilder Op. 9, TrV 128: II. An einsamer Quelle by richard strauss (rising (100K+))
+   Genres: classical, german romanticism, post-romantic era
+   Popularity: rising (100K+)
+   ? High instrumental score aligns closely with user interest profile.
+
+4. Études: No. 6 by philip glass (established (1M+))
+   Genres: american contemporary classical, classical, compositional ambient
+   Popularity: established (1M+)
+   ? High instrumental score matches preference despite lower valence.
+
+5. Giulio Cesare in Egitto, HWV 17, Act III Scene 1: Flow, my tears (Cleopatra) [Sung in English] by george frideric handel (established (1M+))
+   Genres: baroque, classical, early music
+   Popularity: established (1M+)
+   ? High acoustic score matches user's preference for acoustic intensity.
+
+============================================================
+USER PROFILE
+============================================================
+  name            : Lofi Studier
+  genre           : lo-fi
+  mood            : focused
+  energy          : 0.40
+  tempo           : (any)
+  valence         : 0.52
+  danceability    : 0.52
+  acousticness    : 0.70
+  instrumentalness: 0.78
+  speechiness     : 0.05
+
+n tracks by genre: 671
+n tracks by features: 13 at 0.15000000000000002 limit
+querying gemini at T=0.8...
+
+================================================================================
+Top recommendations (RAG-powered from Spotify corpus):
+================================================================================
+
+1. Pillow, Mantra and Trance by li yilei (niche)
+   Genres: chinese experimental, spectra
+   Popularity: niche
+   ? Strong alignment with instrumental and acoustic preferences.
+
+2. What If / Interlude by alfa mist (rising (100K+))
+   Genres: british jazz, indie soul
+   Popularity: rising (100K+)
+   ? High instrumental score matches user's primary preference.
+
+3. Show Me How - Live at RBC Echo Beach by men i trust (major (5M+))
+   Genres: indie pop, pov: indie
+   Popularity: major (5M+)
+   ? Balances high acoustic and moderate valence features perfectly.
+
+4. Cream by hans hu$tle (rising (100K+))
+   Genres: lo-fi jazzhop
+   Popularity: rising (100K+)
+   ? High instrumental focus makes it a strong candidate.
+
+5. You're Also A Jerk by washer (niche)
+   Genres: indie punk
+   Popularity: niche
+   ? Adds needed dynamic variety while maintaining valence alignment.
+
 ```
 
-<!-- **Screenshot or video** *(optional)*: Insert a screenshot or demo video link here -->
+## Design Decisions
+Due to the large corpus, pre-filtering the data was required to bring the context window down to a more reasonable size before querying the AI.
 
 ---
 
-## Experiments You Tried
-
-Use this section to document the experiments you ran.
-- Reducing weight on genre from 2.0 to 0.8
-  - for some profiles the output seemed better and more diverse, while remaining reasonably coherent, but for others the recommendations seemed nonsensical. possibly due to small data
-- Removing energy and valence
-  - caused a lot of the profiles that had strong energy and valence preferences to become nonsensical
+## Testing Summary
+The program was tested with varying profiles and temperatures. The genre tags of the outputs were analyzed to determing reasonability of selected songs.
 
 ---
 
-## Limitations and Risks
-
-Summarize some limitations of your recommender.
-- No lyrics or language
-- no release year
-- recommendations are in a bubble. small amount for diveristy penalty, but still very close to user profile. Never comes up with something unexpected that a user may still like.
-- no feedback function. cannot evolve over time with use
-- hand tuned weights cannot learn what a user prefers more, e.g. if they find acousticness more important than other factors
-- catalog is very small, and is insufficiently diverse for the music that exists
-
-You will go deeper on this in your model card.
+# Guardrails
+Uses regex to extract JSON from Gemini's response, with a fallback to empty list if parsing fails
+Clips JSON response to exactly k recommendations (even if Gemini returns more)
+Validates that songs retured by gemini are actually present in the data sent, skips ones that don't.
 
 ---
 
@@ -141,8 +275,6 @@ Read and complete `model_card.md`:
 [**Model Card**](model_card.md)
 
 Write 1 to 2 paragraphs here about what you learned:
-
-- about how recommenders turn data into predictions
-  - There are a relatively limited number of factors with which to categorize a song, but the way that they can be processed is infinite. It requires a lot of research to determining what extant algorithms to implement, or what mathematical models to use. The input data is also very important, because if the input data is not good, even if the algorithm is good, the outputs will not be good. Strong biases in the inputs will show up in the ouputs, even if the algorithm itself is not biased. It is also quite difficult to determine how exactly a large amount of data is interacting with the algorithm itself.
+Confirmed what I suspected in the first iteration of this project: if the input data is not good, even if the algorithm is good, the outputs will not be good. With a larger corpus, the outputs were much better and I enjoyed the recommendations it made. The underlying data, songs and artists from Spotify's featured, are biased in that they are most popular, so the recommender would be significanly less likely to give a niche recommendation.
 
 

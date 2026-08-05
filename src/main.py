@@ -40,7 +40,11 @@ def main_with_rag() -> None:
 
     profiles = load_profiles("data/test_profiles.csv")
 
-    for profile in profiles[:2]:
+    # vars to play with -------
+    temperature = 0.1
+    #--------------------------
+
+    for profile in profiles[4:5]:
         print_profile_summary(profile)
         print()
 
@@ -53,7 +57,7 @@ def main_with_rag() -> None:
         # print(tracks_text[:500])
         # print()
 
-        rag_recommendations = rag_recommender.recommend(profile, k=5)
+        rag_recommendations = rag_recommender.recommend(profile, k=10, temperature=temperature,  num_candidates=50)
         print_rag_recommendations_table(rag_recommendations)
         print()
 

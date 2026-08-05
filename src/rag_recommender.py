@@ -50,7 +50,7 @@ class RAGRecommender:
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel(model_name)
 
-    def recommend(self, user_profile: UserProfile, k: int = 10, temperature: int=0.3) -> List[UserRecommendation]:
+    def recommend(self, user_profile: UserProfile, k: int = 10, temperature: int=0.3, num_candidates=50) -> List[UserRecommendation]:
         """
         Generate recommendations for a user using RAG over Spotify corpus.
         Args:
@@ -60,17 +60,21 @@ class RAGRecommender:
             List of UserRecommendation objects (includes explanation from Gemini)
         """
         # Step 1: Retrieve candidate songs from corpus matching user profile
-        candidates = self._retrieve_candidates(user_profile, k, temperature)
+        candidates = self._retrieve_candidates(user_profile, num_candidates, temperature)
+        total_candidates = len(candidates)
+        print(f"total tracks {total_candidates}")
+
+        if total_candidates < num_candidates: 
+            print(f"Warning: small dataset! Only {total_candidates} candidate songs found")
 
         # Step 2: Augment candidates with Spotify metadata (keyed by track ID)
         augmented_by_id = self._augment_candidates(candidates)
-
+        
         # Step 3: Ask Gemini to rank and explain based on user profile (returns raw song ids)
         raw_recs = self._generate_recommendations(augmented_by_id, user_profile, temperature, k)
 
         # Step 4: Hydrate into UserRecommendation objects for user
         return self._hydrate_recommendations(raw_recs, augmented_by_id)
-
 
     def _retrieve_candidates(
         self, user_profile: UserProfile, num_candidates: int=CANDIDATE_LIMIT, temperature: int=0.3
@@ -100,7 +104,7 @@ class RAGRecommender:
                 if any(aid in artist_candidates for aid in artist_ids):
                     candidates_genre.add(track.track_id)
 
-        print(f"n tracks by genre: {len(candidates_genre)}")
+        print(f"tracks by genre: {len(candidates_genre)}")
 
         # Strategy 2: Feature-based retrieval
         candidates_feature = set()
@@ -108,11 +112,14 @@ class RAGRecommender:
         while len(candidates_feature) < nfc and max_error<=1:
             max_error += 0.05 # if count doesn't reach threshold, loosen limits
             candidates_feature = self._retrieve_by_features(user_profile, max_error=max_error, min_match=3)
-            candidates_feature -= candidates_genre
-        print(f"n tracks by features: {len(candidates_feature)} at {max_error} limit")
-       
+        candidates_feature -= candidates_genre
+        print(f"tracks by features: {len(candidates_feature)} at {max_error} error limit")
+
         ngc = min(ngc, len(candidates_genre))
         nfc = min(nfc, len(candidates_feature))
+
+        if ngc == 0: nfc = len(candidates_feature)
+        if nfc == 0: ngc = len(candidates_genre)
 
         candidates_set = \
             random.sample(list(candidates_genre), ngc) + \
@@ -219,21 +226,19 @@ Return JSON array with exactly {k} objects:
 ]
 
 Only return the JSON array, no other text."""
-
         try:
             print(f"querying gemini at T={temperature}...")
             response = self.model.generate_content(
                 prompt,
-                generation_config=genai.types.GenerationConfig(max_output_tokens=800),
+                generation_config=genai.types.GenerationConfig(max_output_tokens=max(800, k * 200)),
             )
             text = response.text.strip()
-            print(text)
-
             # Extract JSON
             match = re.search(r"\[.*\]", text, re.DOTALL)
             if match:
                 data = json.loads(match.group())
             else:
+                print("invalid JSON string returned")
                 data = []
 
             return data[:k]
