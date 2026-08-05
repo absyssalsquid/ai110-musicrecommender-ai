@@ -9,26 +9,16 @@ You will implement the functions in recommender.py:
 - recommend_songs
 """
 
-from recommender import load_songs, load_profiles, UserProfile, Recommender
+from recommender import load_songs, load_profiles, Recommender
+from spotify_corpus import SpotifyCorpus
+from rag_recommender import RAGRecommender
 
 
 def main() -> None:
-    songs = load_songs("data/songs.csv") 
+    songs = load_songs("data/songs.csv")
     rec = Recommender(songs)
 
     profiles = load_profiles("data/test_profiles.csv")
-
-    user_prefs = {
-        "genre": "pop",
-        "mood": "happy",
-        "energy": 0.8,
-        "tempo_bpm": 110,
-        "valence": 0.7,
-        "danceability" : 0.66, 
-        "acousticness": 0.4,
-        "instrumentalness": 0.02,
-        "speechiness": 0.8,
-    }
 
     for profile in profiles:
         print_profile_summary(profile)
@@ -36,7 +26,38 @@ def main() -> None:
 
         recommendations = rec.recommend_plus(profile, k=5)
         print_recommendations_table(recommendations)
+        print()
 
+
+def main_with_rag() -> None:
+    """Run recommender with RAG augmentation."""
+    print("Loading Spotify corpus...")
+    corpus = SpotifyCorpus()
+    corpus.load_tracks("data/featured_Spotify_track_info.csv")
+    corpus.load_artists("data/featured_Spotify_artist_info.csv")
+
+    rag_recommender = RAGRecommender(corpus)
+
+    profiles = load_profiles("data/test_profiles.csv")
+
+    for profile in profiles[:2]:
+        print_profile_summary(profile)
+        print()
+
+        # Test candidate retrieval only
+        # candidates = rag_recommender._retrieve_candidates(profile, num_candidates=100, temperature=0.9)
+        # print(f"Retrieved {len(candidates)} candidates")
+        # augmented_by_id = rag_recommender._augment_candidates(candidates)
+        # tracks_text = rag_recommender._format_tracks_for_gemini(augmented_by_id)
+        # print("Formatted tracks for Gemini:")
+        # print(tracks_text[:500])
+        # print()
+
+        rag_recommendations = rag_recommender.recommend(profile, k=5)
+        print_rag_recommendations_table(rag_recommendations)
+        print()
+
+# -------------------------- without RAG ---------------------------------
 
 def print_profile_summary(profile) -> None:
     """Print the user profile the recommendations are based on."""
@@ -59,7 +80,6 @@ def print_profile_summary(profile) -> None:
         else:
             shown = str(val)
         print(f"  {label:<16}: {shown}")
-
 
 def print_recommendations_table(recommendations) -> None:
     """
@@ -120,5 +140,22 @@ def print_recommendations_table(recommendations) -> None:
           "dnc=danceability acu=acousticness ins=instrumentalness spc=speechiness")
 
 
+# -------------------------- with RAG ---------------------------------
+
+def print_rag_recommendations_table(recs) -> None:
+    """Print recommendations from RAG recommender."""
+    print("=" * 80)
+    print("Top recommendations (RAG-powered from Spotify corpus):")
+    print("=" * 80)
+
+    for i, rec in enumerate(recs, 1):
+        print(f"\n{i}. {rec.song_name} by {rec.artist_info}")
+        print(f"   Genres: {', '.join(rec.genres)}")
+        print(f"   Popularity: {rec.popularity_tier}")
+        print(f"   ? {rec.explanation}")
+
+
 if __name__ == "__main__":
-    main()
+    # Uncomment one:
+    # main()
+    main_with_rag()  # Run with RAG augmentation

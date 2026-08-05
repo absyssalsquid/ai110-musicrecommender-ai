@@ -35,7 +35,7 @@ class UserProfile:
     target_energy: float
     likes_acoustic: bool
 
-    genre: str
+    genre: str | list
     mood: str
     energy: float
     tempo_bpm: int
@@ -229,7 +229,7 @@ class Recommender:
         lo = []
 
         for k, v in difference.items():
-            if k == "penalty": 
+            if k == "penalty":
                 continue
             if v < 0.05: hi.append(k)
             if v > 0.95: lo.append(k)
@@ -237,6 +237,20 @@ class Recommender:
         if hi: ret += f" -- high alignment (<0.05): {", ".join(hi)}"
         if lo: ret += f" -- low alignment (>0.95): {", ".join(lo)}"
         return ret
+
+    def recommend_with_rag(self, user: UserProfile, k: int = 5, rag_context_builder=None):
+        """Recommend songs with RAG augmentation (with explanations)."""
+        base_recs = self.recommend_plus(user, k=k)
+
+        if rag_context_builder is None:
+            return base_recs
+
+        rag_recs = []
+        for song, score, distance in base_recs:
+            context = rag_context_builder.build_context(song, score, user.favorite_genre)
+            rag_recs.append(context)
+
+        return rag_recs
     
 
 def load_songs(csv_path: str) -> List[Song]:
